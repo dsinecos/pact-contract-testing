@@ -1,10 +1,14 @@
-package main
+package provider
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+)
+
+const (
+	PORT = 9000
 )
 
 type Greeting struct {
@@ -22,16 +26,18 @@ func greetingHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Error marshalling JSON: %s", err)
 	}
+	w.Header().Add("Content-Type", "application/json")
 
 	fmt.Fprint(w, string(serializedGreeting))
 }
 
-func main() {
+func InitProvider() error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/greeting", greetingHandler)
 
-	err := http.ListenAndServe(":9000", mux)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", PORT), mux)
 	if err != nil {
-		log.Fatalf("Error: %+v", err)
+		return err
 	}
+	return nil
 }
