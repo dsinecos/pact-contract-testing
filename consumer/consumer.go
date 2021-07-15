@@ -15,16 +15,21 @@ const (
 	errorUnmarshallingResponseBody = "error unmarshalling response body %w"
 )
 
+const (
+	baseURL = "http://%s:%d"
+	path    = "greeting"
+)
+
 type Greeting struct {
-	Language string `json:"language"`
-	Message  string `json:"message"`
+	Language string `json:"language" pact:"example=EN"`
+	Message  string `json:"message" pact:"example=Hello"`
 }
 
-func FetchGreeting(baseURL, path string) (*Greeting, error) {
+func FetchGreeting(host string, port int) (*Greeting, error) {
 
 	httpClient := http.DefaultClient
 
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, fmt.Sprintf("%s/%s", baseURL, path), nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, fmt.Sprintf("%s/%s", fmt.Sprintf(baseURL, host, port), path), nil)
 	if err != nil {
 		return nil, fmt.Errorf(errorCreatingRequest, err)
 	}
@@ -44,6 +49,8 @@ func FetchGreeting(baseURL, path string) (*Greeting, error) {
 	if err != nil {
 		return nil, fmt.Errorf(errorUnmarshallingResponseBody, err)
 	}
+
+	fmt.Printf("Output %+v", greeting)
 
 	return &greeting, nil
 }
