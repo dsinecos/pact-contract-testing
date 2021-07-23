@@ -47,7 +47,7 @@ func FetchGreeting(host string, port int) (*Greeting, error) {
 	var greeting Greeting
 	err = json.Unmarshal(data, &greeting)
 	if err != nil {
-		return nil, fmt.Errorf(errorUnmarshallingResponseBody, err)
+		return nil, fmt.Errorf(fmt.Sprintf("%s, %s", errorUnmarshallingResponseBody, data), err)
 	}
 
 	fmt.Printf("Output %+v", greeting)
