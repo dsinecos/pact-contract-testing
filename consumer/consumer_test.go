@@ -9,7 +9,7 @@ import (
 
 func Test_FetchGreeting(t *testing.T) {
 
-	mockProvider, err := pact.NewV2Pact(pact.MockHTTPProviderConfig{
+	mockProvider, err := pact.NewV3Pact(pact.MockHTTPProviderConfig{
 		Consumer: "GreetingAPIConsumer",
 		Provider: "GreetinAPI",
 	})
@@ -18,14 +18,21 @@ func Test_FetchGreeting(t *testing.T) {
 	// Arrange: Setup our expected interactions
 	mockProvider.
 		AddInteraction().
-		Given("An endpoint to fetch greeting exists").
+		Given(pact.ProviderStateV3{
+			Name: "An endpoint to fetch greeting exists",
+		}).
 		UponReceiving("A request for Greeting").
 		WithRequest("GET", pact.S("/greeting")).
 		WillRespondWith(200).
+		WithHeader("Content-Type", pact.S("application/json")).
 		// WithJSONBody(pact.Equality("test")) // Returns error "attempted to use matchers from a higher spec version". Need to use pact.NewV3Pact to use these matchers
+		WithJSONBody(pact.Map{
+			"language": pact.S("EN"),
+			"message":  pact.S("Hello"),
+		})
 		// WithJSONBody(Greeting{})
 		// WithJSONBody(pact.Term("admin", "admin|user|guest"))
-		WithBodyMatch(Greeting{})
+		// WithBodyMatch(Greeting{})
 
 	// Act: test our API client behaves correctly
 	err = mockProvider.ExecuteTest(t, func(config pact.MockServerConfig) error {

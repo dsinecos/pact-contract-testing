@@ -5,7 +5,6 @@
   "interactions": [
     {
       "description": "A request for Greeting",
-      "providerState": "An endpoint to fetch greeting exists",
       "request": {
         "method": "GET",
         "path": "/greeting"
@@ -18,14 +17,6 @@
         "headers": {
           "Content-Type": "application/json"
         },
-        "matchingRules": {
-          "$.body.language": {
-            "match": "type"
-          },
-          "$.body.message": {
-            "match": "type"
-          }
-        },
         "status": 200
       }
     }
@@ -35,7 +26,7 @@
       "version": "0.9.3"
     },
     "pactSpecification": {
-      "version": "2.0.0"
+      "version": "3.0.0"
     }
   },
   "provider": {
