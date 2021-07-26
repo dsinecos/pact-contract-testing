@@ -60,6 +60,6 @@
     }
   },
   "provider": {
-    "name": "GreetinAPI"
+    "name": "GreetingAPI"
   }
 }

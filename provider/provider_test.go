@@ -44,7 +44,7 @@ func Test_Provider(t *testing.T) {
 	err := verifier.VerifyProvider(t, VerifyRequest{
 		ProviderBaseURL: "http://localhost:9000",
 		PactFiles: []string{
-			filepath.ToSlash(fmt.Sprintf("%s/GreetingAPIConsumer-GreetinAPI.json", pactDir)),
+			filepath.ToSlash(fmt.Sprintf("%s/GreetingAPIConsumer-GreetingAPI.json", pactDir)),
 		},
 		// RequestFilter: f,
 		// BeforeEach: func() error {
