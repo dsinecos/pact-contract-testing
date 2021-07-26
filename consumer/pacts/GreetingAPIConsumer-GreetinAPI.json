@@ -19,6 +19,36 @@
         },
         "status": 200
       }
+    },
+    {
+      "description": "A request that triggers internal server error",
+      "request": {
+        "method": "GET",
+        "path": "/internalerror"
+      },
+      "response": {
+        "body": {
+          "message": "Internal Server Error",
+          "status_code": 500
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.status_code": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            }
+          },
+          "header": {}
+        },
+        "status": 500
+      }
     }
   ],
   "metadata": {

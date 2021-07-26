@@ -16,8 +16,9 @@ const (
 )
 
 const (
-	baseURL = "http://%s:%d"
-	path    = "greeting"
+	baseURL   = "http://%s:%d"
+	path      = "greeting"
+	errorPath = "internalerror"
 )
 
 type Greeting struct {
@@ -55,24 +56,51 @@ func FetchGreeting(host string, port int) (*Greeting, error) {
 	return &greeting, nil
 }
 
-// type Error struct {
-// 	IsHTTPError    bool
-// 	HTTPStatusCode int
-// 	ErrorMessage   string
+type ErrorResponse struct {
+	HTTPStatusCode int    `json:"status_code"`
+	ErrorMessage   string `json:"message"`
+}
 
-// 	Err error
-// }
+type Error struct {
+	HTTPStatusCode int
+	ErrorMessage   string
+}
 
-// func NewError(
-// 	e error, isHTTPError bool, statusCode int, message string,
-// ) *Error {
-// 	return nil
-// }
+func (e *Error) Error() string {
+	return fmt.Sprintf("Error - %s | HTTPStatusCode %d", e.ErrorMessage, e.HTTPStatusCode)
+}
 
-// func (e *Error) Error() string {
-// 	return fmt.Sprintf("Error - %s | HTTPStatusCode %d", e.ErrorMessage, e.HTTPStatusCode)
-// }
+func FetchInternalError(host string, port int) (*Greeting, error) {
 
-// func (e *Error) Unwrap() error {
-// 	return e.Err
-// }
+	httpClient := http.DefaultClient
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, fmt.Sprintf("%s/%s", fmt.Sprintf(baseURL, host, port), errorPath), nil)
+	if err != nil {
+		return nil, fmt.Errorf(errorCreatingRequest, err)
+	}
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf(errorSendingRequest, err)
+	}
+
+	data, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf(errorReadingResponseBody, err)
+	}
+
+	var errResponse ErrorResponse
+	err = json.Unmarshal(data, &errResponse)
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("%s, %s", errorUnmarshallingResponseBody, data), err)
+	}
+
+	fmt.Printf("Output %+v", errResponse)
+
+	err = &Error{
+		HTTPStatusCode: errResponse.HTTPStatusCode,
+		ErrorMessage:   errResponse.ErrorMessage,
+	}
+
+	return nil, err
+}

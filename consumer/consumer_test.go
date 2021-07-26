@@ -1,6 +1,8 @@
 package consumer
 
 import (
+	"fmt"
+	"net/http"
 	"testing"
 
 	pact "github.com/pact-foundation/pact-go/v2/sugar"
@@ -48,5 +50,45 @@ func Test_FetchGreeting(t *testing.T) {
 
 		return err
 	})
+	assert.NoError(t, err)
+}
+
+func Test_FetchInternalError(t *testing.T) {
+
+	mockProvider, err := pact.NewV3Pact(pact.MockHTTPProviderConfig{
+		Consumer: "GreetingAPIConsumer",
+		Provider: "GreetinAPI",
+	})
+	assert.NoError(t, err)
+
+	// Arrange: Setup our expected interactions
+	mockProvider.
+		AddInteraction().
+		Given(pact.ProviderStateV3{
+			Name: "An endpoint to fetch internal error exists",
+		}).
+		UponReceiving("A request that triggers internal server error").
+		WithRequest("GET", pact.S("/internalerror")).
+		WillRespondWith(500).
+		WithHeader("Content-Type", pact.S("application/json")).
+		WithJSONBody(pact.Map{
+			"status_code": pact.Integer(500),
+			"message":     pact.S("Internal Server Error"),
+		})
+
+	// Act: test our API client behaves correctly
+	err = mockProvider.ExecuteTest(t, func(config pact.MockServerConfig) error {
+		// Execute the API client
+		greeting, err := FetchInternalError(config.Host, config.Port)
+
+		// Assert: check the result
+		assert.EqualError(t, err, fmt.Sprintf("Error - %s | HTTPStatusCode %d", http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError))
+
+		assert.Nil(t, greeting)
+
+		return nil
+	})
+
+	// assert.Error(t, err)
 	assert.NoError(t, err)
 }
