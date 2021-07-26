@@ -2,12 +2,46 @@ package consumer
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"testing"
 
 	pact "github.com/pact-foundation/pact-go/v2/sugar"
 	"github.com/stretchr/testify/assert"
 )
+
+const PactDir = "pacts"
+
+func deletePactDir() {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Error getting current working directory %+v", err)
+	}
+
+	pactDir := filepath.Join(cwd, PactDir)
+	_, err = os.Stat(pactDir)
+	if err != nil {
+		return
+	}
+
+	err = os.RemoveAll(pactDir)
+	if err != nil {
+		log.Fatalf("Error deleting folder %+v", err)
+	}
+}
+
+func TestMain(m *testing.M) {
+	// Setup
+	deletePactDir()
+
+	r := m.Run()
+
+	// Teardown
+
+	os.Exit(r)
+}
 
 func Test_FetchGreeting(t *testing.T) {
 
