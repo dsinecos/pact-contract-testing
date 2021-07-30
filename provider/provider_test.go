@@ -1,8 +1,6 @@
 package provider
 
 import (
-	"fmt"
-	"path/filepath"
 	"testing"
 
 	. "github.com/pact-foundation/pact-go/v2/sugar"
@@ -11,7 +9,7 @@ import (
 
 // var dir, _ = os.Getwd()
 // var pactDir = fmt.Sprintf("../consumer/pacts", dir)
-const pactDir = "../consumer/pacts"
+// const pactDir = "../consumer/pacts"
 
 // Example Provider Pact: How to run me!
 // 1. cd <pact-go>/examples/v3
@@ -42,10 +40,14 @@ func Test_Provider(t *testing.T) {
 
 	// Verify the Provider with local Pact Files
 	err := verifier.VerifyProvider(t, VerifyRequest{
-		ProviderBaseURL: "http://localhost:9000",
-		PactFiles: []string{
-			filepath.ToSlash(fmt.Sprintf("%s/GreetingAPIConsumer-GreetingAPI.json", pactDir)),
-		},
+		ProviderBaseURL:            "http://localhost:9000",
+		BrokerURL:                  "http://localhost:9292",
+		Provider:                   "GreetingAPI",
+		ProviderVersion:            "1.0.0",
+		PublishVerificationResults: true,
+		// PactFiles: []string{
+		// 	filepath.ToSlash(fmt.Sprintf("%s/GreetingAPIConsumer-GreetingAPI.json", pactDir)),
+		// },
 		// RequestFilter: f,
 		// BeforeEach: func() error {
 		// 	log.Println("[DEBUG] HOOK before each")

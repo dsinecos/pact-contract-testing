@@ -6,7 +6,7 @@ services:
     healthcheck:
       test: psql postgres --command "select 1" -U postgres
     volumes:
-      - postgres-volume:/var/lib/postgresql/data
+      - ./db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -44,5 +44,5 @@ services:
   #   ports:
   #     - "443:443"
   #     - "80:80"
-volumes:
-  postgres-volume:
+# volumes:
+#   postgres-volume:
